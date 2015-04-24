@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Temperature and humidity</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!--<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js"></script>-->
+    <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" src="js/parse-1.2.8.min.js"></script>
+    <script type="text/javascript" src="js/date.format.js"></script>
+	<script type='text/javascript' src='https://www.google.com/jsapi'></script>
+	<script type="text/javascript">
+        google.load("visualization", "1", {packages:["corechart"]});
+        google.setOnLoadCallback(drawChart);
+        
+        Parse.initialize("ZKO8dy1AE8bESiGKEtoV2WzayMX023OpCabQ3ijl", "fgKvOnZvBjqIfbWL10I3ZRHILpujZURKnnoYZaeS");
+
+	    $(document).ready(function() {
+		var THObject = Parse.Object.extend("THObject");
+		var query = new Parse.Query(THObject);
+        query.descending("createdAt");
+        query.limit(24);
+
+		query.find({
+			success: function(results) {
+				//alert("yay! it worked");
+                var obj = results[0];
+				var temperature = obj.get("temperature");
+				//$('#showTemp').text(temperature);
+                var tempArray = [['Time', 'Temperature', 'Humidity']];
+
+                for(var i = results.length - 1;i >= 0; i--) {
+                    var thObj = results[i];
+                    var createTime = thObj.createdAt.format('mm/dd hh:MM');
+                    var temperature = thObj.get("temperature");
+                    var humidity = thObj.get("humidity");
+                    var temp = [createTime, temperature, humidity];
+                    tempArray.push(temp);
+                }
+
+                drawChart(tempArray);
+			},
+			error: function(object, error) {
+				alert('error');
+			}
+		});
+	});
+
+        function drawChart(tempArray) {
+            var data = google.visualization.arrayToDataTable(tempArray);
+
+            var options = {
+                title: 'Temperature(°C) and humidity(%) in Wise`s room'
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
+    </script>
+	
+  </head>
+  <body>
+      <div id="chart_div" style="width: 900px; height: 500px;"></div>
+  </body>
+</html>

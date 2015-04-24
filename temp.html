@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Temperature and humidity</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js"></script>
+    <script type="text/javascript" src="http://jsgauge.googlecode.com/svn/trunk/src/gauge.js"></script>
+    <script type="text/javascript" src="http://jsgauge.googlecode.com/svn/trunk/src/jquery.gauge.js"></script>
+	<script type="text/javascript">
+		
+	$(document).ready(function(){
+		temperature = 0;
+		humidity = 20;
+
+		function readsensordata() {
+		
+			$.getJSON('index.py?json=1', function(jd) {
+				temperature = parseFloat(jd.temperature);
+				humidity = parseFloat(jd.humidity);
+				// alert('hum: '+humidity+' temp: '+temperature);
+				$('#temperaturegauge').gauge('setValue', temperature);
+				$("#humiditygauge").gauge('setValue', humidity);
+			});
+		
+		}
+
+		
+        $("#temperaturegauge")
+          .gauge({
+             min: 0,
+             max: 50,
+             label: 'Temperature',
+             bands: [{color: "#ff0000", from: 40, to: 50}],
+			 unitsLabel: '' + String.fromCharCode(186) + 'C'
+           })
+          .gauge('setValue', temperature);
+        
+		$("#humiditygauge")
+          .gauge({
+             min: 20,
+             max: 90,
+             label: 'Humidity',
+             bands: [{color: "#ff0000", from: 70, to: 90}],
+			 unitsLabel: '%'
+           })
+          .gauge('setValue', humidity);
+		 
+		 
+		readsensordata();
+
+		
+    });
+    </script>
+	
+  </head>
+  <body>
+    <canvas id="temperaturegauge" width="200" height="200"></canvas>
+	<canvas id="humiditygauge" width="200" height="200"></canvas>
+
+
+   
+  </body>
+</html>
